@@ -1,0 +1,84 @@
+package compi1.ex4;
+
+import java_cup.runtime.*;
+
+class Parser;
+
+parser code{:
+
+public void syntax_error(Symbol s){
+	System.out.println("Sintax error: " +s.value + " en la línea " + s.right+ " en la columna " + s.left);
+}
+
+public void unrecovered_syntax_error(Symbol s)throws java.lang.Exception{
+	System.out.println("Sintax error: " +s.value + " en la línea " + s.right+" en la columna " + s.left);
+}
+
+:};
+
+terminal ID, NUM, COMMA, LLA, LLC, PCOMMA, TIPO, IG, SUM, MUL;
+
+non terminal arbol E, OP, OP1, L, D, S;
+
+start with S;
+
+S ::= LLA L:l1 LLC{:
+        arbol s = new arbol("S");
+        s.addHijo(new arbol("{"));
+        s.addHijo(l1);
+        s.addHijo(new arbol("}"));
+        RESULT = s;
+    :};
+
+L ::= L:l1 D:d{:
+        arbol l = new arbol("L");
+        l.addHijo(l1);
+        l.addHijo(d);
+        RESULT = l;
+    :}
+    |D:d{:
+        arbol l = new arbol("L");
+        l.addHijo(d);
+        RESULT = l;
+    :};
+
+D ::= ID:id IG E:e1 PCOMMA{:
+        arbol d = new arbol("D");
+        d.addHijo(new arbol(id.toString()));
+        d.addHijo(new arbol("="));
+        d.addHijo(e1);
+        d.addHijo(new arbol(";"));
+        RESULT = d;
+    :};
+
+E ::=NUM:num{:
+        arbol e = new arbol("E");
+		e.addHijo(new arbol(num.toString()));
+		RESULT = e;
+    :} 
+    |OP:op{:
+        arbol e = new arbol("E");
+        e.addHijo(op);
+		RESULT = e;
+    :};
+
+OP ::= SUM  E:e1 E:e2{:
+        arbol op = new arbol("OP");
+		op.addHijo(new arbol("+"));
+        op.addHijo(e1);
+        op.addHijo(e2);
+		RESULT = op;
+    :}
+    |OP1:op1{:
+        arbol op = new arbol("OP");
+        op.addHijo(op1);
+		RESULT = op;
+    :};
+
+OP1 ::= MUL E:e1 E:e2{:
+        arbol op1 = new arbol("OP1");
+		op1.addHijo(new arbol("*"));
+        op1.addHijo(e1);
+        op1.addHijo(e2);
+		RESULT = op1;
+    :};
